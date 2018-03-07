@@ -36,8 +36,14 @@ auth [success=2 default=ignore] pam_ssh_agent_auth.so file=/etc/ssh/sudo_authori
 @include common-session-noninteractive
 ```
 
-## Step 1: Install docker
+## Step 2: Install docker
 
 ```bash
 ./setup_docker.sh
+```
+
+## Step 3: Install Kubernetes tools
+
+```bash
+./setup_kubernetes_tools
 ```
