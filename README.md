@@ -3,40 +3,44 @@
 This repo is used to install Kubernetes on an OrangePI PC2 cluster.
 The boards are running Armbian.
 
-## Step 1: Install SSH Agent sudo
+Download image from:
+
+```plain
+https://dl.armbian.com/orangepipc2/Ubuntu_xenial_next.7z
+```
+
+## Step 1: Prepare system
+
+Login as root:
+
+Initit script will:
+
+- Ask you to change root password
+- Ask you to create a user: `pi`
+- Set hostname: `hostnamectl set-hostname yourHostName`
 
 ```bash
+sudo usermod -aG sudo pi
+echo "pi ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/pi
+sudo chmod 0440 /etc/sudoers.d/pi
+sudo reboot
+```
+
+Login as `pi`:
+
+```bash
+mkdir -p /home/pi/.ssh
+curl https://github.com/ewoutp.keys > /home/pi/.ssh/authorized_keys
+chmod -R og-rwx /home/pi/.ssh
+
 sudo apt-get update
-sudo apt-get install -y libpam-ssh-agent-auth
-curl https://github.com/ewoutp.keys | sudo tee /etc/ssh/sudo_authorized_keys
-```
-
-```bash
-sudo visudo
-```
-
-Insert:
-
-```plain
-Defaults env_keep += SSH_AUTH_SOCK`
-```
-
-```bash
-sudo nano /etc/pam.d/sudo
-```
-
-Set to:
-
-```plain
-#%PAM-1.0
-
-auth [success=2 default=ignore] pam_ssh_agent_auth.so file=/etc/ssh/sudo_authorized_keys
-@include common-auth
-@include common-account
-@include common-session-noninteractive
+sudo apt-get upgrade
+sudo apt-get install -y overlayroot
 ```
 
 ## Step 2: Install docker
+
+Clone this repo and cd into it.
 
 ```bash
 ./setup_docker.sh
@@ -46,4 +50,19 @@ auth [success=2 default=ignore] pam_ssh_agent_auth.so file=/etc/ssh/sudo_authori
 
 ```bash
 ./setup_kubernetes_tools
+```
+
+## Step 4: Create Kubernetes cluster
+
+on master:
+
+```bash
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+```
+
+## Step 5: Freeze filesystem
+
+```bash
+echo 'overlayroot="tmpfs:recurse=0"' | sudo tee /etc/overlayroot.conf
+sudo reboot
 ```
