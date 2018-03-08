@@ -36,6 +36,7 @@ chmod -R og-rwx /home/pi/.ssh
 sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install -y overlayroot
+sudo systemctl disable zram-config.service
 ```
 
 ## Step 2: Install USB data disk
@@ -62,6 +63,7 @@ function moveToBind {
 }
 moveToBind /var/log /mnt/data/var/log
 moveToBind /var/lib/docker /mnt/data/var/lib/docker
+moveToBind /var/lib/etcd /mnt/data/var/lib/etcd
 ```
 
 ## Step 3: Install docker
