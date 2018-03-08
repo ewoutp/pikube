@@ -38,7 +38,33 @@ sudo apt-get upgrade
 sudo apt-get install -y overlayroot
 ```
 
-## Step 2: Install docker
+## Step 2: Install USB data disk
+
+```bash
+(
+echo t  # Set type
+echo 83 # Type linux
+echo w  # Write & exit
+) | sudo fdisk /dev/sda
+sudo mkfs.ext4 -F /dev/sda1
+sudo mkdir -p /mnt/data
+echo "UUID=$(sudo blkid /dev/sda1 -s UUID -o value) /mnt/data ext4 defaults,noatime,nodiratime 0"  | sudo tee -a /etc/fstab
+sudo mount -a
+function moveToBind {
+    src=$1
+    dst=$2
+    [ -d $src ] || mkdir $src
+    sudo mkdir -p $(dirname $dst)
+    sudo mv $src $dst
+    sudo mkdir -p $src
+    sudo mount -o bind $dst $src
+    echo "${dst} ${src} none bind 0 0" | sudo tee -a /etc/fstab
+}
+moveToBind /var/log /mnt/data/var/log
+moveToBind /var/lib/docker /mnt/data/var/lib/docker
+```
+
+## Step 3: Install docker
 
 Clone this repo and cd into it.
 
@@ -46,13 +72,13 @@ Clone this repo and cd into it.
 ./setup_docker.sh
 ```
 
-## Step 3: Install Kubernetes tools
+## Step 4: Install Kubernetes tools
 
 ```bash
 ./setup_kubernetes_tools
 ```
 
-## Step 4: Create Kubernetes cluster
+## Step 5: Create Kubernetes cluster
 
 on master:
 
@@ -60,7 +86,7 @@ on master:
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16
 ```
 
-## Step 5: Freeze filesystem
+## Step 6: Freeze filesystem
 
 ```bash
 echo 'overlayroot="tmpfs:recurse=0"' | sudo tee /etc/overlayroot.conf
