@@ -54,7 +54,7 @@ sudo mount -a
 function moveToBind {
     src=$1
     dst=$2
-    [ -d $src ] || mkdir $src
+    [ -d $src ] || sudo mkdir -p $src
     sudo mkdir -p $(dirname $dst)
     sudo mv $src $dst
     sudo mkdir -p $src
