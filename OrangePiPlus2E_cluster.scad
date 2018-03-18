@@ -5,13 +5,13 @@ spdh = 73; // Small pin delta height (center to center)
 spoh = 3; // Small pin delta (in height direction) from board edge 
 spow = (bw-spdw)/2; // Small pin offset Y from board edge 
 h = 4; // Height of plate
-ph = 23; // Pin height
+ph = 25; // Pin height
 pr = 4; // Large pin radius
 pbr = pr*1.7; // Large pin base radius
 pow = pbr/2; // Offset from board to  large pin center
 poh = pbr/2; // Offset from board to  large pin center
 spr = 2.6; // Small pin radius
-sph = 4; // Small pin height
+sph = 3; // Small pin height
 xbs = 2; // Extra board size
 beam = spr*2;
 antd = 5; // antenne diameter
@@ -30,14 +30,18 @@ module pin_with_hole(posx, posy,goUp) {
           cylinder(r=r1, ph, $fs=.3);
         translate([posx ,posy, ph+h], $fs=.3)
           cylinder(r=r2, h, $fs=.3);
+        translate([posx ,posy, ph+h*2], $fs=.3)
+          sphere(r=r2, $fs=.3);
       } else {
         translate([posx ,posy, h], $fs=.3)
-          cylinder(r=r1, h, $fs=.3);        
+          cylinder(r=r1, h*1.5, $fs=.3);        
+        translate([posx ,posy, h*2.5], $fs=.3)
+          sphere(r=r1, $fs=.3);
       }
     }
     // Create hole for upper pin to fit in
     translate([posx, posy, 0])
-      cylinder(r=r2+0.2, h, $fs=.3);
+      cylinder(r=r2+0.2, h*2, $fs=.3);
   }
 }
 
